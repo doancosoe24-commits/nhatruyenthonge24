@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Đề mục 6</title>
+
+<style>
+  body{
+    margin:0;
+    background:white;
+    font-family:Arial, sans-serif;
+  }
+
+  /* Thanh player */
+  .player-bar{
+    position:fixed;
+    bottom:0;
+    width:100%;
+    background:#5fa8ad;
+    padding:18px 0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:16px;
+    box-shadow:0 -4px 10px rgba(0,0,0,0.1);
+    z-index:30;
+  }
+
+  .circle-btn{
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    border:none;
+    background:rgba(255,255,255,0.25);
+    backdrop-filter:blur(5px);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    cursor:pointer;
+    transition:0.18s;
+  }
+
+  .circle-btn:hover{
+    background:rgba(255,255,255,0.4);
+    transform:scale(1.05);
+  }
+
+  .play-btn{
+    width:75px;
+    height:75px;
+    background:rgba(255,255,255,0.35);
+  }
+
+  .circle-btn svg{
+    width:26px;
+    height:26px;
+    fill:#083c3f;
+  }
+
+  .play-btn svg{
+    width:32px;
+    height:32px;
+  }
+
+  /* Fullscreen playlist overlay */
+  .playlist-overlay{
+    position:fixed;
+    inset:0; /* top:0; right:0; bottom:0; left:0; */
+    background:rgba(4,12,14,0.6);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    padding:20px;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 180ms ease;
+  }
+
+  .playlist-overlay.open{
+    display:flex;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.995); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  /* Playlist modal content */
+  .playlist-modal{
+    width:100%;
+    max-width:900px;
+    max-height:90%;
+    background:#ffffff;
+    border-radius:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+
+  .playlist-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:14px 18px;
+    border-bottom:1px solid rgba(8,60,63,0.06);
+    background:linear-gradient(90deg, rgba(95,168,173,0.03), rgba(95,168,173,0.01));
+  }
+
+  .playlist-header h4{
+    margin:0;
+    color:#083c3f;
+    font-size:18px;
+  }
+
+  .close-btn{
+    background:transparent;
+    border:none;
+    font-size:20px;
+    cursor:pointer;
+    padding:8px;
+    border-radius:8px;
+  }
+
+  .close-btn:hover{
+    background:rgba(0,0,0,0.06);
+  }
+
+  .playlist-body{
+    padding:12px;
+    overflow:auto;
+    flex:1;
+  }
+
+  .playlist-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .playlist-list li{
+    padding:12px;
+    border-radius:8px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    cursor:pointer;
+    transition:0.12s;
+    background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0));
+  }
+
+  .playlist-list li:hover{
+    background:rgba(95,168,173,0.06);
+    transform: translateY(-1px);
+  }
+
+  .playlist-list li.active{
+    background:linear-gradient(90deg, rgba(95,168,173,0.12), rgba(95,168,173,0.06));
+    border-left:4px solid #08585a;
+  }
+
+  .track-info{
+    display:flex;
+    flex-direction:column;
+  }
+
+  .track-title{
+    font-weight:600;
+    color:#063233;
+  }
+
+  .track-sub{
+    font-size:12px;
+    color:#6b7a7a;
+  }
+
+  /* Main content styling (giữ giống trang chính) */
+  main{
+    padding-bottom:120px; /* cho chừa chỗ player */
+  }
+  .content_main{
+    margin-top: 40px;
+    text-align:center;
+  }
+  .content_main h1{
+    margin:8px 0;
+    color:#b30b0b;
+  }
+  .hero-img{
+    width:100%;
+    height:250px;
+    object-fit:cover;
+    margin-bottom:10px;
+  }
+  .content{
+    max-width:1000px;
+    margin:0 auto 60px;
+    padding:0 12px;
+  }
+  .content p{
+    font-style: italic;
+    text-indent: 1.5em;
+    margin:10px 5px;
+  }
+
+  /* Responsive */
+  @media(max-width:600px){
+    .circle-btn{width:38px;height:38px;}
+    .play-btn{width:64px;height:64px;}
+    .playlist-modal{max-width:100%; max-height:100%; border-radius:8px;}
+    .playlist-header h4{font-size:16px;}
+    .hero-img{height:160px;}
+  }
+</style>
+</head>
+
+<body>
+
+<div class="player-bar">
+
+  <!-- Previous -->
+  <button class="circle-btn" id="prev" title="Previous" aria-label="Previous">
+    <svg viewBox="0 0 24 24">
+      <polygon points="11,12 18,18 18,6"/>
+      <rect x="6" y="6" width="2" height="12"/>
+    </svg>
+  </button>
+
+  <!-- Play -->
+  <button class="circle-btn play-btn" id="play" title="Play / Pause" aria-label="Play / Pause">
+    <svg id="playIcon" viewBox="0 0 24 24">
+      <polygon points="8,5 19,12 8,19"/>
+    </svg>
+  </button>
+
+  <!-- Next -->
+  <button class="circle-btn" id="next" title="Next" aria-label="Next">
+    <svg viewBox="0 0 24 24">
+      <polygon points="13,12 6,6 6,18"/>
+      <rect x="16" y="6" width="2" height="12"/>
+    </svg>
+  </button>
+
+  <!-- Volume -->
+  <button class="circle-btn" id="volumeBtn" title="Mute" aria-label="Mute">
+    <svg viewBox="0 0 24 24">
+      <polygon points="3,9 7,9 12,5 12,19 7,15 3,15"/>
+      <path d="M16 8 Q20 12 16 16" stroke="#083c3f" stroke-width="2" fill="none"/>
+    </svg>
+  </button>
+
+  <!-- Repeat -->
+  <button class="circle-btn" id="repeat" title="Repeat current" aria-label="Repeat">
+    <svg viewBox="0 0 24 24">
+      <path d="M7 7h10v3l4-4-4-4v3H5v6" fill="#083c3f"/>
+      <path d="M17 17H7v-3l-4 4 4 4v-3h12v-6" fill="#083c3f"/>
+    </svg>
+  </button>
+
+  <!-- Menu -->
+  <button class="circle-btn" id="menuBtn" title="Menu / Playlist" aria-label="Menu / Playlist">
+    <svg viewBox="0 0 24 24">
+      <rect x="4" y="6" width="16" height="2"/>
+      <rect x="4" y="11" width="16" height="2"/>
+      <rect x="4" y="16" width="10" height="2"/>
+    </svg>
+  </button>
+
+</div>
+
+<main>
+  <div class="content_main">
+     <h4 style="font-size: 20px;color: red;text-align: center;">Đề mục 6: GIAI ĐOẠN 1988- 2020</h4>
+  </div>
+
+  <!-- ảnh bìa riêng cho đề mục 1 -->
+  <img class="hero-img" src="./img/Trang bìa.jpg" alt="Đề mục 1 - bìa">
+ <h4 style="color:rgb(131, 8, 8); margin:4px 0;text-align: center;text-transform: uppercase;">TRỞ LẠI TÂY NGUYÊN - PHÁT HUY TRUYỀN THỐNG ANH HÙNG,XÂY DỰNG TRUNG ĐOÀN VỮNG MẠNH TOÀN DIỆN</h4>
+  <div class="content">
+    <p style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Kính thưa thủ trưởng,</p>
+    <p style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Kính thưa toàn thể các đồng chí!</p>
+    <p style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Mảng ảnh Đề mục 6: Giai đoạn 1988- 2020 là giai đoạn Trung đoàn trở lại Tây Nguyên- Phát huy truyền thống anh hùng, xây dựng Trung đoàn vững mạnh toàn diện.</p>
+    <p style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Những hình ảnh mà thủ trưởng và các đồng chí xem trên mảng ảnh Đề mục 6 đã phản ánh chặng đường Trung đoàn 24 trở lại Tây Nguyên, tiếp tục phát huy truyền thống anh hùng trong thời kỳ xây dựng và bảo vệ Tổ quốc. Đầu năm 1988, Trung đoàn cơ động vào Tây Nguyên đóng quân, thực hiện nhiệm vụ sẵn sàng chiến đấu, xây dựng chính quy và tham gia phát triển kinh tế- xã hội trên địa bàn chiến lược, góp phần giữ vững ổn định chính trị, trật tự an toàn xã hội.</p>
+    <p style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Hình ảnh duyệt đội ngũ tại lễ kỷ niệm 50 năm Ngày thành lập Trung đoàn (1996) thể hiện sự trưởng thành vững chắc của đơn vị trong điều kiện mới. Bước vào giai đoạn đổi mới, Trung đoàn thường xuyên phối hợp với cấp ủy, chính quyền và lực lượng vũ trang địa phương huấn luyện quân dự bị động viên, giữ vững thế trận quốc phòng toàn dân, xây dựng mối quan hệ đoàn kết quân- dân ngày càng bền chặt, tiêu biểu là các hoạt động giúp dân, khám bệnh, chăm sóc sức khỏe cho nhân dân trên địa bàn.</p>
+    <p style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Cùng với nhiệm vụ xây dựng đơn vị, Trung đoàn chú trọng nâng cao trình độ tổ chức chỉ huy, khả năng sẵn sàng chiến đấu thông qua các cuộc diễn tập chỉ huy- cơ quan ngoài thực địa, bảo đảm sát thực tế chiến đấu. Ghi nhận những thành tích nổi bật, Trung đoàn long trọng tổ chức kỷ niệm 65 năm Ngày truyền thống và vinh dự đón nhận Huân chương Bảo vệ Tổ quốc hạng Ba, khẳng định vị thế của một đơn vị chủ lực vững mạnh.</p>
+    <p style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Quán triệt sâu sắc các nghị quyết của Đảng, Quân đội và cấp trên, Trung đoàn luôn coi trọng công tác xây dựng lực lượng, huấn luyện chiến sĩ mới, xây dựng nền nếp chính quy. Uy tín và chất lượng tổng hợp của đơn vị tiếp tục được khẳng định khi được Bộ Quốc phòng chọn làm đơn vị điểm phát động thi đua cao điểm chào mừng 40 năm Ngày giải phóng miền Nam, thống nhất đất nước.</p>
+    <p style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Hình ảnh Đại hội Đảng bộ Trung đoàn nhiệm kỳ 2015- 2020 cùng các hoạt động xây dựng doanh trại chính quy, xanh, sạch, đẹp thể hiện quyết tâm chính trị cao của cán bộ, chiến sĩ trong xây dựng Trung đoàn vững mạnh toàn diện, sẵn sàng nhận và hoàn thành tốt mọi nhiệm vụ được giao, xứng đáng với truyền thống anh hùng của Trung đoàn 24 trên mảnh đất Tây Nguyên.</p>
+    <p style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Trân trọng cảm ơn thủ trưởng và các đồng chí đã tham quan Đề mục 6: Giai đoạn 1988- 2020.</p>
+  </div>
+   <footer style="color: red;font-weight: 600; font-size: 16px;margin-top: 30px;text-align: center;">Tác giả: Trung tá Phạm Văn Thuận</footer>
+</main>
+
+<!-- Fullscreen Playlist Overlay -->
+<div class="playlist-overlay" id="playlistOverlay" aria-hidden="true" role="dialog" aria-label="Playlist">
+  <div class="playlist-modal" role="document" id="playlistModal">
+    <div class="playlist-header">
+      <h4>Playlist</h4>
+      <div>
+        <button class="close-btn" id="closeBtn" aria-label="Đóng playlist">✕</button>
+      </div>
+    </div>
+
+    <div class="playlist-body" id="playlistBody">
+      <ul class="playlist-list" id="trackList">
+        <!-- JS tạo danh sách -->
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Audio element -->
+<audio id="audio" preload="none"></audio>
+
+<script>
+/* === CHỈ SỬA / THÊM Ở ĐÂY: logic để trang biết mình đang ở mục nào và autoplay ===
+   Mọi HTML/CSS bên ngoài không thay đổi.
+*/
+
+/* Danh sách bài đầy đủ (giữ cấu trúc page giống file của bạn) */
+const tracks = [
+  // ví dụ: track 1 có page -> khi prev/next tới track 1 sẽ điều hướng
+  { title: "Giới thiệu tổng quan", src: "./audio/giới thiệu.mp3", content:"Giới thiệu", page: "./gioithieu.html" },
+  { title: "Đề mục 1: giai đoạn 1946-1954",  src: "./audio/đề mục 1.mp3",  content:"Đề mục 1", page: "./demuc1.html" },
+  { title: "Đề mục 2: giai đoạn 1955-1971",  src: "./audio/đề mục 2.mp3", content:"Đề mục 2", page: "./demuc2.html" },
+  { title: "Đề mục 3: giai đoạn 1971-1975",  src: "./audio/đề mục 3.mp3",  content:"Đề mục 3", page: "./demuc3.html" },
+  { title: "Đề mục 4: giai đoạn 1976-1979",  src: "./audio/đề mục 4.mp3", content:"Đề mục 4", page: "./demuc4.html" },
+  { title: "Đề mục 5: giai đoạn 1979-1988",  src: "./audio/đề mục 5.mp3",  content:"Đề mục 5", page: "./demuc5.html" },
+  { title: "Đề mục 6: giai đoạn 1988-2020",  src: "./audio/đề mục 6.mp3", content:"Đề mục 6", page: "./demuc6.html" },
+  { title: "Đề mục 7: giai đoạn 2020 đến nay",  src: "./audio/đề mục 7.mp3",  content:"Đề mục 7", page: "./demuc7.html" },
+  { title: "Trận chiến đấu đánh điểm, diệt viện phương điếm- đường 17 của Trung đoàn 42 Trung Dũng",  src: "./audio/Sa bàn trận đánh.mp3.mp3", content:"sa bàn", page: "./saban.html" },
+  { title: "Trận chiến đấu thọc sâu đánh chiếm sân bay Tân Sơn Nhất của Trung đoàn Bộ binh 24 Trung Dũng",  src: "./audio/trận đánh tân sơn nhất.mp3", content:"tân sơn nhất", page: "./tansonnhat.html" },
+];
+
+/* DOM elements (không đổi) */
+const audio = document.getElementById("audio");
+const playBtn = document.getElementById("play");
+const playIcon = document.getElementById("playIcon");
+const repeatBtn = document.getElementById("repeat");
+const prevBtn = document.getElementById("prev");
+const nextBtn = document.getElementById("next");
+const volumeBtn = document.getElementById("volumeBtn");
+const menuBtn = document.getElementById("menuBtn");
+
+const playlistOverlay = document.getElementById("playlistOverlay");
+const playlistModal = document.getElementById("playlistModal");
+const closeBtn = document.getElementById("closeBtn");
+const trackListEl = document.getElementById("trackList");
+
+let currentIndex = 0;
+let isRepeat = false;
+
+/* Helper: lấy tên file hiện tại (không bao gồm query string) */
+function currentFilename() {
+  const path = location.pathname;
+  const file = path.split('/').pop();
+  return file || 'index.html';
+}
+
+/* Helper: đọc query param */
+function getQueryParam(name) {
+  return new URLSearchParams(location.search).get(name);
+}
+
+/* Helper: thêm ?autoplay=1 nếu cần */
+function addAutoplayParam(page, autoplay) {
+  if (!autoplay) return page;
+  return page + (page.includes('?') ? '&' : '?') + 'autoplay=1';
+}
+
+/* --- render playlist (giữ giống cấu trúc ban đầu) --- */
+function renderPlaylist() {
+  trackListEl.innerHTML = "";
+  tracks.forEach((t, i) => {
+    const li = document.createElement("li");
+    li.dataset.index = i;
+
+    const info = document.createElement("div");
+    info.className = "track-info";
+
+    const title = document.createElement("div");
+    title.className = "track-title";
+    title.textContent = t.title + (t.page ? " ▸" : "");
+
+    const sub = document.createElement("div");
+    sub.className = "track-sub";
+    sub.textContent = `Bài ${i+1}`;
+
+    info.appendChild(title);
+    info.appendChild(sub);
+
+    const btns = document.createElement("div");
+    btns.style.display = "flex";
+    btns.style.gap = "8px";
+    btns.style.alignItems = "center";
+
+    const playNow = document.createElement("button");
+    playNow.className = "circle-btn";
+    playNow.style.width = "40px";
+    playNow.style.height = "40px";
+    playNow.title = "Phát";
+    playNow.ariaLabel = "Phát";
+    playNow.innerHTML = '<svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:#083c3f;"><polygon points="8,5 19,12 8,19"/></svg>';
+    playNow.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      loadTrack(i, true);
+    });
+
+    btns.appendChild(playNow);
+    li.appendChild(info);
+    li.appendChild(btns);
+
+    li.addEventListener("click", () => {
+      const track = tracks[i];
+      if (track.page) {
+        // nếu có page -> điều hướng kèm autoplay để trang đích tự phát
+        window.location.href = addAutoplayParam(track.page, true);
+      } else {
+        loadTrack(i, true);
+        closePlaylist();
+      }
+    });
+
+    trackListEl.appendChild(li);
+  });
+}
+
+/* Highlight hiện tại */
+function highlightCurrent() {
+  const items = trackListEl.querySelectorAll("li");
+  items.forEach(li => li.classList.remove("active"));
+  const cur = trackListEl.querySelector(`li[data-index="${currentIndex}"]`);
+  if (cur) cur.classList.add("active");
+}
+
+/* Load track theo index */
+function loadTrack(index, playNow = false) {
+  if (index < 0 || index >= tracks.length) return;
+  currentIndex = index;
+  audio.src = tracks[currentIndex].src;
+  highlightCurrent();
+  if (playNow) {
+    audio.play().catch(()=>{/* bị chặn autoplay có thể xảy ra */});
+    setPlayIcon(true);
+  } else {
+    setPlayIcon(false);
+  }
+}
+
+/* Play/pause */
+function togglePlay() {
+  if (audio.paused) {
+    audio.play().catch(()=>{});
+    setPlayIcon(true);
+  } else {
+    audio.pause();
+    setPlayIcon(false);
+  }
+}
+
+/* Hiển thị icon play/pause */
+function setPlayIcon(playing) {
+  if (playing) {
+    playIcon.innerHTML = '<rect x="7" y="6" width="3" height="12"/><rect x="14" y="6" width="3" height="12"/>';
+  } else {
+    playIcon.innerHTML = '<polygon points="8,5 19,12 8,19"/>';
+  }
+}
+
+/* Prev/Next: wrap-around; nếu target có page -> điều hướng kèm autoplay */
+function prevTrack(){
+  let newIndex = currentIndex - 1;
+  if (newIndex < 0) newIndex = tracks.length - 1; // wrap to last
+  const target = tracks[newIndex];
+  if (target && target.page) {
+    window.location.href = addAutoplayParam(target.page, true);
+  } else {
+    loadTrack(newIndex, true);
+  }
+}
+
+function nextTrack(){
+  let newIndex = currentIndex + 1;
+  if (newIndex >= tracks.length) newIndex = 0; // wrap to first
+  const target = tracks[newIndex];
+  if (target && target.page) {
+    window.location.href = addAutoplayParam(target.page, true);
+  } else {
+    loadTrack(newIndex, true);
+  }
+}
+
+/* Khi audio kết thúc */
+audio.addEventListener("ended", ()=>{
+  if (isRepeat) {
+    audio.currentTime = 0;
+    audio.play();
+    return;
+  }
+  const nextIndex = (currentIndex + 1) % tracks.length;
+  const target = tracks[nextIndex];
+  if (target && target.page) {
+    window.location.href = addAutoplayParam(target.page, true);
+  } else {
+    loadTrack(nextIndex, true);
+  }
+});
+
+/* Repeat toggle */
+repeatBtn.onclick = ()=> {
+  isRepeat = !isRepeat;
+  audio.loop = false;
+  repeatBtn.style.background = isRepeat ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.25)";
+};
+
+/* Hook up buttons */
+playBtn.onclick = togglePlay;
+prevBtn.onclick = prevTrack;
+nextBtn.onclick = nextTrack;
+
+volumeBtn.onclick = ()=> {
+  audio.muted = !audio.muted;
+  volumeBtn.style.background = audio.muted ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.25)";
+};
+
+/* Playlist open/close */
+menuBtn.onclick = (e)=> { e.stopPropagation(); openPlaylist(); };
+closeBtn.onclick = (e)=> { e.stopPropagation(); closePlaylist(); };
+
+function openPlaylist(){
+  playlistOverlay.classList.add("open");
+  playlistOverlay.setAttribute("aria-hidden", "false");
+  closeBtn.focus();
+}
+
+function closePlaylist(){
+  playlistOverlay.classList.remove("open");
+  playlistOverlay.setAttribute("aria-hidden", "true");
+  menuBtn.focus();
+}
+
+/* Click ngoài modal đóng */
+playlistOverlay.addEventListener("click", (e) => {
+  if(!playlistModal.contains(e.target)) closePlaylist();
+});
+playlistModal.addEventListener("click", (e) => e.stopPropagation());
+
+/* Keyboard */
+document.addEventListener("keydown", (e)=>{
+  if(e.code === "Space") { e.preventDefault(); togglePlay(); }
+  else if (e.key && e.key.toLowerCase() === "m") { audio.muted = !audio.muted; volumeBtn.style.background = audio.muted ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.25)"; }
+  else if (e.code === "ArrowRight") nextTrack();
+  else if (e.code === "ArrowLeft") prevTrack();
+  else if (e.code === "Escape" && playlistOverlay.classList.contains("open")) closePlaylist();
+});
+
+/* === INIT: render playlist, detect current page, set currentIndex, autoplay nếu có param === */
+function init() {
+  renderPlaylist();
+
+  const file = currentFilename(); // ex: demuc1.html
+  // tìm track có page trùng file (so sánh basename)
+  const idx = tracks.findIndex(t => t.page && t.page.split('/').pop() === file);
+  currentIndex = (idx >= 0) ? idx : 0;
+
+  highlightCurrent();
+
+  const shouldAuto = getQueryParam('autoplay') === '1';
+  loadTrack(currentIndex, shouldAuto);
+}
+
+init();
+
+/* === KẾT THÚC PHẦN SCRIPT SỬA === */
+</script>
+
+</body>
+</html>

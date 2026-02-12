@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+<title>Nhà Truyền Thống E24</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family: "Segoe UI", Roboto, sans-serif;
+}
+
+body{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  overflow:hidden;
+}
+.page{
+  display: flex;
+  justify-content: center;  /* căn ngang */
+  align-items: center;      /* căn dọc */
+  flex-direction: column;
+  height: 100vh;            /* full màn hình */
+}
+/* Trang sách */
+
+
+/* Logo */
+.logo{
+  width:120px;
+  height:120px;
+  margin:0 auto 20px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center
+}
+
+.logo img{
+  max-width:70%;
+}
+
+/* Tiêu đề */
+h1{
+  font-size:1.6rem;
+  color:rgb(48, 132, 236);
+  letter-spacing:1px;
+  margin-bottom:12px;
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+}
+
+.subtitle{
+  font-size:14px;
+  color:#7a4a1f;
+  margin-bottom:32px;
+  text-transform: uppercase;
+  font-weight: 700;
+  text-align: center;
+  color: red;
+}
+
+/* Nút */
+button{
+  border:none;
+  padding:14px 26px;
+  font-size:1rem;
+  font-weight:600;
+  background:rgb(18, 144, 18);
+  color:gold;
+  cursor:pointer;
+  box-shadow:0 10px 25px rgba(0,0,0,.25);
+  transition:transform .25s ease, box-shadow .25s ease;
+  text-transform: uppercase;
+  display: flex;
+  
+}
+
+button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 15px 30px rgba(0,0,0,.35);
+}
+
+/* Hiệu ứng lật sách */
+.leaving{
+  animation: exitPage 1s cubic-bezier(.4,0,.2,1) forwards;
+}
+
+@keyframes exitPage{
+  0%{
+    transform:perspective(1200px) rotateY(0deg) scale(1);
+    opacity:1;
+  }
+  40%{
+    transform:perspective(1200px) rotateY(18deg) scale(.97);
+    box-shadow:-20px 0 40px rgba(0,0,0,.18);
+  }
+  100%{
+    transform:perspective(1200px) rotateY(45deg) scale(.88);
+    opacity:0;
+  }
+}
+
+/* Responsive */
+@media(max-width:480px){
+  h1{font-size:1.4rem;}
+}
+@media(max-width:360px){
+  .subtitle{
+    font-size: 12px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="page" id="page">
+  <div class="logo">
+    <img src="./img/logo.png" alt="Logo">
+  </div>
+
+  <h1>Chào Mừng Các Đồng Chí </h1>
+  <div class="subtitle">
+    Tham quan nhà truyền thống trung đoàn 24
+    <p style="margin-top: 5px;">(đoàn trung dũng)</p>
+  </div>
+   <img height="200px" style="margin-bottom: 30px;" src="./img/Trang bìa.jpg" alt="">
+  <button id="backBtn">Giới thiệu tổng quan</button>
+
+
+  <footer style="color: red;font-weight: 600; font-size: 16px;margin-top: 30px;">Tác giả: Trung tá Phạm Văn Thuận</footer>
+</div>
+
+<script>
+const page = document.getElementById("page");
+const backBtn = document.getElementById("backBtn");
+const flipSound = new Audio("lat-sach.mp3");
+flipSound.volume = 0.4;
+
+backBtn.addEventListener("click", () => {
+  flipSound.currentTime = 0;
+  flipSound.play().catch(()=>{});
+
+  page.classList.add("leaving");
+
+  setTimeout(() => {
+    window.location.href = "gioithieu.html";
+  }, 1000);
+});
+</script>
+
+</body>
+</html>

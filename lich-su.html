@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Lịch Sử — Nhà Truyền Thống E24</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#fbf7ef;
+  --card:#fff7ea;
+  --accent:#8b2b18;
+  --gold:#d4a93b;
+  --muted:#6b5b4a;
+}
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:'Nunito',system-ui;
+  background:linear-gradient(180deg,var(--bg),#fff);
+  color:var(--muted);
+  padding:28px;
+}
+
+.wrap{max-width:1100px;margin:auto}
+
+header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:24px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.brand img{
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  box-shadow:0 8px 18px rgba(0,0,0,.15);
+}
+
+.brand h1{
+  margin:0;
+  font-size:20px;
+  color:var(--accent);
+}
+
+.btn{
+  padding:8px 14px;
+  border-radius:10px;
+  border:2px solid rgba(139,43,24,.2);
+  background:none;
+  font-weight:700;
+  cursor:pointer;
+  color:var(--accent);
+}
+
+.timeline{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+
+.card{
+  background:var(--card);
+  border-radius:16px;
+  padding:18px;
+  box-shadow:0 12px 28px rgba(0,0,0,.08);
+  cursor:pointer;
+  transition:.3s;
+  opacity:0;
+  transform:translateY(30px);
+}
+
+.card.show{
+  opacity:1;
+  transform:none;
+}
+
+.card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 18px 36px rgba(0,0,0,.12);
+}
+
+.hero-img{
+  height:160px;
+  border-radius:12px;
+  background:linear-gradient(135deg,#f4e3c5,#ecd3a1);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  font-weight:700;
+  color:var(--accent);
+}
+
+.date{
+  margin-top:14px;
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:8px;
+  background:rgba(139,43,24,.08);
+  color:var(--accent);
+  font-weight:700;
+}
+
+.title{
+  font-size:18px;
+  margin:10px 0 6px;
+  color:#4a2a18;
+}
+
+.desc{
+  font-size:14px;
+  line-height:1.5;
+}
+
+@media(max-width:900px){
+  .timeline{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+<header>
+  <div class="brand">
+    <img src="./img/logo.png" alt="Logo">
+    <h1>Nhà Truyền Thống E24</h1>
+  </div>
+  <button class="btn" onclick="location.href='index.html'">◀ Trở về</button>
+</header>
+
+<main>
+  <section class="timeline">
+
+    <!-- CARD 1 -->
+    <article class="card" data-id="1945-1950">
+      <div class="hero-img">1945</div>
+      <div class="date">1945 – 1950</div>
+      <div class="title">Cách mạng & Khởi đầu</div>
+      <div class="desc">
+        Giai đoạn hình thành lực lượng, tham gia kháng chiến,
+        đặt nền móng truyền thống anh hùng.
+      </div>
+    </article>
+
+    <!-- CARD 2 -->
+    <article class="card" data-id="1951-1975">
+      <div class="hero-img">1951</div>
+      <div class="date">1951 – 1975</div>
+      <div class="title">Kháng chiến chống Mỹ</div>
+      <div class="desc">
+        Chiến đấu kiên cường, lập nhiều chiến công xuất sắc,
+        góp phần giải phóng đất nước.
+      </div>
+    </article>
+
+    <!-- CARD 3 -->
+    <article class="card" data-id="1976-2000">
+      <div class="hero-img">1976</div>
+      <div class="date">1976 – 2000</div>
+      <div class="title">Xây dựng & bảo vệ</div>
+      <div class="desc">
+        Củng cố lực lượng, huấn luyện chính quy,
+        bảo vệ vững chắc Tổ quốc.
+      </div>
+    </article>
+
+  </section>
+</main>
+
+</div>
+
+<script>
+/* hiệu ứng xuất hiện */
+const cards = document.querySelectorAll('.card');
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting) e.target.classList.add('show');
+  });
+},{threshold:.2});
+cards.forEach(c=>io.observe(c));
+
+/* click card → trang chi tiết */
+cards.forEach(card=>{
+  card.addEventListener('click',()=>{
+    const id = card.dataset.id;
+    window.location.href = `lichsu-detail.html?id=${id}`;
+  });
+});
+</script>
+
+</body>
+</html>
