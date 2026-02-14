@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Giới Thiệu Tổng Quan</title>
+<style>
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+
+background:
+  radial-gradient(ellipse at 12% 18%, rgba(255,215,235,0.9) 0 12%, transparent 45%),
+  radial-gradient(ellipse at 82% 22%, rgba(255,250,210,0.85) 0 14%, transparent 48%),
+  radial-gradient(ellipse at 35% 85%, rgba(210,255,235,0.85) 0 16%, transparent 55%),
+  radial-gradient(ellipse at 95% 95%, rgba(230,240,255,0.8) 0 14%, transparent 50%),
+  linear-gradient(180deg, #fff6ef 0%, #f3fff8 60%, #effff7 100%);
+
+}
+
+  /* Thanh player */
+  .player-bar{
+    position:fixed;
+    bottom:0;
+    width:100%;
+    background:#5fa8ad;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:16px;
+    box-shadow:0 -4px 10px rgba(0,0,0,0.1);
+    z-index:30;
+    padding: 18px 0;
+  }
+
+.circle-btn{
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,0.35);
+
+  /* Màu nền fallback cho trình duyệt cũ */
+  background:rgba(255,255,255,0.22);
+
+  /* Glassmorphism (có fallback) */
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+  user-select:none;
+  -webkit-tap-highlight-color: transparent;
+
+  box-shadow:
+    0 6px 16px rgba(0,0,0,0.18),
+    inset 0 1px 1px rgba(255,255,255,0.35);
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    background .18s ease;
+}
+
+
+  .circle-btn:hover{
+    background:rgba(255,255,255,0.4);
+    transform:scale(1.05);
+  }
+
+  .play-btn{
+    width:75px;
+    height:75px;
+    background:rgba(255,255,255,0.35);
+  }
+
+  .circle-btn svg{
+    width:26px;
+    height:26px;
+    fill:#083c3f;
+  }
+
+  .play-btn svg{
+    width:32px;
+    height:32px;
+  }
+
+  /* Fullscreen playlist overlay */
+  .playlist-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(4,12,14,0.6);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    padding:20px;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 180ms ease;
+  }
+
+  .playlist-overlay.open{
+    display:flex;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.995); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  /* Playlist modal content */
+  .playlist-modal{
+    width:100%;
+    max-width:900px;
+    max-height:90%;
+    background:#ffffff;
+    border-radius:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+
+  .playlist-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:14px 18px;
+    border-bottom:1px solid rgba(8,60,63,0.06);
+    background:linear-gradient(90deg, rgba(95,168,173,0.03), rgba(95,168,173,0.01));
+  }
+
+  .playlist-header h4{
+    margin:0;
+    color:#083c3f;
+    font-size:18px;
+  }
+
+  .close-btn{
+    background:transparent;
+    border:none;
+    font-size:20px;
+    cursor:pointer;
+    padding:8px;
+    border-radius:8px;
+  }
+
+  .close-btn:hover{
+    background:rgba(0,0,0,0.06);
+  }
+
+  .playlist-body{
+    padding:12px;
+    overflow:auto;
+    flex:1;
+  }
+
+  .playlist-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .playlist-list li{
+    padding:12px;
+    border-radius:8px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    cursor:pointer;
+    transition:0.12s;
+    background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0));
+  }
+
+  .playlist-list li:hover{
+    background:rgba(95,168,173,0.06);
+    transform: translateY(-1px);
+  }
+
+  .playlist-list li.active{
+    background:linear-gradient(90deg, rgba(95,168,173,0.12), rgba(95,168,173,0.06));
+    border-left:4px solid #08585a;
+  }
+
+  .track-info{
+    display:flex;
+    flex-direction:column;
+  }
+
+  .track-title{
+    font-weight:600;
+    color:#063233;
+  }
+
+  .track-sub{
+    font-size:12px;
+    color:#6b7a7a;
+  }
+
+  /* Main content spacing so player doesn't cover */
+  main{
+    padding-bottom:120px;
+  }
+  .content_main{
+    margin-top:40px;
+    text-align:center;
+  }
+.hero-img{
+    width:70%;
+    height:auto;
+    object-fit:cover;
+    margin-bottom:10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px auto;
+  }
+  .content{
+    max-width:1000px;
+    margin:0 auto 60px;
+    padding:0 12px;
+  }
+  .content p{
+    font-style: italic;
+    text-indent: 1.5em;
+    margin:10px 5px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  @media(max-width:600px){
+    .circle-btn{width:38px;height:38px;}
+    .play-btn{width:64px;height:64px;}
+    .playlist-modal{max-width:100%; max-height:100%; border-radius:8px;}
+    .playlist-header h4{font-size:16px;}
+    .hero-img{height:auto; width:100%;}
+  }
+ 
+</style>
+</head>
+<body>
+
+<div class="player-bar">
+
+  <!-- Previous -->
+  <button class="circle-btn" id="prev" title="Previous" aria-label="Previous">
+    <svg viewBox="0 0 24 24">
+      <polygon points="11,12 18,18 18,6"/>
+      <rect x="6" y="6" width="2" height="12"/>
+    </svg>
+  </button>
+
+  <!-- Play -->
+  <button class="circle-btn play-btn" id="play" title="Play / Pause" aria-label="Play / Pause">
+    <svg id="playIcon" viewBox="0 0 24 24">
+      <polygon points="8,5 19,12 8,19"/>
+    </svg>
+  </button>
+
+  <!-- Next -->
+  <button class="circle-btn" id="next" title="Next" aria-label="Next">
+    <svg viewBox="0 0 24 24">
+      <polygon points="13,12 6,6 6,18"/>
+      <rect x="16" y="6" width="2" height="12"/>
+    </svg>
+  </button>
+
+  <!-- Volume -->
+  <button class="circle-btn" id="volumeBtn" title="Mute" aria-label="Mute">
+    <svg viewBox="0 0 24 24">
+      <polygon points="3,9 7,9 12,5 12,19 7,15 3,15"/>
+      <path d="M16 8 Q20 12 16 16" stroke="#083c3f" stroke-width="2" fill="none"/>
+    </svg>
+  </button>
+
+  <!-- Repeat -->
+  <button class="circle-btn" id="repeat" title="Repeat current" aria-label="Repeat">
+    <svg viewBox="0 0 24 24">
+      <path d="M7 7h10v3l4-4-4-4v3H5v6" fill="#083c3f"/>
+      <path d="M17 17H7v-3l-4 4 4 4v-3h12v-6" fill="#083c3f"/>
+    </svg>
+  </button>
+
+  <!-- Menu -->
+  <button class="circle-btn" id="menuBtn" title="Menu / Playlist" aria-label="Menu / Playlist">
+    <svg viewBox="0 0 24 24">
+      <rect x="4" y="6" width="16" height="2"/>
+      <rect x="4" y="11" width="16" height="2"/>
+      <rect x="4" y="16" width="10" height="2"/>
+    </svg>
+  </button>
+
+</div>
+
+<main>
+  <div class="content_main">
+     <h4 style="color: red;">Đề mục 5: TRƯNG BÀY NHỮNG PHẦN THƯỞNG CAO QUÝ ĐẢNG, NHÀ NƯỚC VÀ QUÂN ĐỘI TRAO TẶNG CHO TRUNG ĐOÀN</h4>
+  </div>
+  <div class="content">
+    <p>Kính mời thủ trưởng và các đồng chí tham quan Đề mục 5: Trưng bày những phần thưởng cao quý Đảng, Nhà nước và Quân đội trao tặng cho Trung đoàn.</p>
+    <p>Kính thưa toàn thể các đồng chí!</p>
+    <p>Tại khu vực này, trưng bày các phần thưởng cao quý mà Đảng, Nhà nước, Quân đội và các cấp trao tặng Trung đoàn 24 trong suốt quá trình xây dựng, chiến đấu và trưởng thành.</p>
+    <p>Nổi bật là hai lá cờ Anh hùng lực lượng vũ trang nhân dân trên cùng bên cạnh khánh tiết. Hàng Cờ thưởng, Cờ thi đua, Huân chương, Bằng khen, Giấy khen và các danh hiệu vinh dự khác. Mỗi phần thưởng là sự ghi nhận xứng đáng đối với những thành tích đặc biệt xuất sắc, tinh thần chiến đấu anh dũng, ý chí vượt khó và sự đoàn kết, thống nhất cao của cán bộ, chiến sĩ Trung đoàn qua từng giai đoạn.</p>
+    <p>Bên cạnh đó là những lời khen tặng, đánh giá của cấp trên, thể hiện niềm tin tưởng, sự trân trọng và tự hào đối với truyền thống quyết chiến, quyết thắng của đơn vị. Tiêu biểu là hai câu khen ngợi của cố Đại tướng Võ Nguyên Giáp tặng Trung đoàn “Dũng cảm, cơ động, linh hoạt” và là đơn vị “Đảng tin, dân mến, quân thù khiếp sợ”.</p>
+    <p>Các phần thưởng không chỉ là niềm vinh dự to lớn mà còn là trách nhiệm, là động lực để các thế hệ cán bộ, chiến sĩ hôm nay tiếp tục giữ vững và phát huy danh hiệu cao quý mà các thế hệ đi trước đã dày công vun đắp, xây dựng Trung đoàn ngày càng vững mạnh.</p>
+    <p>Trân trọng cảm ơn thủ trưởng và các đồng chí đã tham quan Đề mục 5: Trưng bày những phần thưởng cao quý Đảng, Nhà nước và Quân đội trao tặng cho Trung đoàn.</p>
+  </div>
+  <footer style="color: red;font-weight: 600; font-size: 16px;margin-top: 30px;text-align: center;">Tác giả: Trung tá Phạm Văn Thuận</footer>
+</main>
+<!-- Fullscreen Playlist Overlay -->
+<div class="playlist-overlay" id="playlistOverlay" aria-hidden="true" role="dialog" aria-label="Playlist">
+  <div class="playlist-modal" role="document" id="playlistModal">
+    <div class="playlist-header">
+      <h4>Playlist</h4>
+      <div>
+        <button class="close-btn" id="closeBtn" aria-label="Đóng playlist">✕</button>
+      </div>
+    </div>
+
+    <div class="playlist-body" id="playlistBody">
+      <ul class="playlist-list" id="trackList"></ul>
+    </div>
+  </div>
+</div>
+<!-- Audio element -->
+<audio id="audio" preload="none"></audio>
+
+<script>
+/* Danh sách bài — thêm thuộc tính `page` nếu muốn điều hướng khi click hàng hoặc prev/next */
+const tracks = [
+  // ví dụ: track 1 có page -> khi prev/next tới track 1 sẽ điều hướng
+  { title: "Giới thiệu tổng quan", src: "./audio/giới thiệu.mp3", content:"Giới thiệu", page: "./gioithieu.html" },
+  { title: "Đề mục 1- Không gian khánh tiết", src: "./audio/3. Đề mục 1- Không gian khánh tiết.mp3", content:"Không gian khánh tiết", page: "./khonggiankhanhtiet.html" },
+  { title: "Đề mục 2- Lịch sử hình thành, phát triển Trung đoàn", src: "./audio/4. Đề mục 2- Lịch sử hình thành, phát triển Trung đoàn.mp3", content:"Giới thiệu", page: "lichsuhinhthanh.html" },
+  { title: "Mảng ảnh 1- Đề mục 2 giai đoạn 1946-1954",  src: "./audio/5. Mảng ảnh 1- Đề mục 2.mp3",  content:"Đề mục 1", page: "./demuc1.html" },
+  { title: "Mảng ảnh 2- Đề mục 2 giai đoạn 1955-1971",  src: "./audio/6. Mảng ảnh 2- Đề mục 2.mp3", content:"Đề mục 2", page: "./demuc2.html" },
+  { title: "Mảng ảnh 3- Đề mục 2 giai đoạn 1971-1975",  src: "./audio/7. Mảng ảnh 3- Đề mục 2.mp3",  content:"Đề mục 3", page: "./demuc3.html" },
+  { title: "Mảng ảnh 4- Đề mục  giai đoạn 1976-1979",  src: "./audio/8. Mảng ảnh 4- Đề mục 2.mp3", content:"Đề mục 4", page: "./demuc4.html" },
+  { title: "Mảng ảnh 5- Đề mục 2 giai đoạn 1979-1988",  src: "./audio/9. Mảng ảnh 5- Đề mục 2.mp3",  content:"Đề mục 5", page: "./demuc5.html" },
+  { title: "Mảng ảnh 6- Đề mục 2 giai đoạn 1988-2020",  src: "./audio/10. Mảng ảnh 6- Đề mục 2.mp3", content:"Đề mục 6", page: "./demuc6.html" },
+  { title: "Mảng ảnh 7- Đề mục 2 giai đoạn 2020 đến nay",  src: "./audio/11. Mảng ảnh 7- Đề mục 2.mp3",  content:"Đề mục 7", page: "./demuc7.html" },
+  { title: "Đề mục 3- Trận đánh điểm diệt viện",  src: "./audio/12. Đề mục 3- Trận đánh điểm diệt viện.mp3", content:"sa bàn", page: "./saban.html" },
+  { title: "Đề mục 3- Trận đánh Sân bay Tân Sơn Nhất",  src: "./audio/13. Đề mục 3- Trận đánh Sân bay Tân Sơn Nhất.mp3", content:"tân sơn nhất", page: "./tansonnhat.html" },
+  { title: "Đề mục 4- Hiện vật lịch sử",  src: "./audio/14. Đề mục 4- Hiện vật lịch sử .mp3", content:"tân sơn nhất", page: "./hienvatlichsu.html" },
+  { title: "Đề mục 5- Phần thưởng cao quý",  src: "./audio/15. Đề mục 5- Phần thưởng cao quý.mp3", content:"tân sơn nhất", page: "./phanthuongcaoquy.html" },
+];
+
+const audio = document.getElementById("audio");
+const playBtn = document.getElementById("play");
+const playIcon = document.getElementById("playIcon");
+const repeatBtn = document.getElementById("repeat");
+const prevBtn = document.getElementById("prev");
+const nextBtn = document.getElementById("next");
+const volumeBtn = document.getElementById("volumeBtn");
+const menuBtn = document.getElementById("menuBtn");
+
+const playlistOverlay = document.getElementById("playlistOverlay");
+const playlistModal = document.getElementById("playlistModal");
+const closeBtn = document.getElementById("closeBtn");
+const trackListEl = document.getElementById("trackList");
+
+let currentIndex = 0;
+let isRepeat = false;
+
+/* Render playlist */
+function renderPlaylist() {
+  trackListEl.innerHTML = "";
+  tracks.forEach((t, i) => {
+    const li = document.createElement("li");
+    li.dataset.index = i;
+
+    const info = document.createElement("div");
+    info.className = "track-info";
+
+    const title = document.createElement("div");
+    title.className = "track-title";
+    title.textContent = t.title + (t.page ? " ▸" : "");
+
+    const sub = document.createElement("div");
+    sub.className = "track-sub";
+    sub.textContent = `Bài ${i+1}`;
+
+    info.appendChild(title);
+    info.appendChild(sub);
+
+    const btns = document.createElement("div");
+    btns.style.display = "flex";
+    btns.style.gap = "8px";
+    btns.style.alignItems = "center";
+
+    const playNow = document.createElement("button");
+    playNow.className = "circle-btn";
+    playNow.style.width = "40px";
+    playNow.style.height = "40px";
+    playNow.title = "Phát";
+    playNow.ariaLabel = "Phát";
+    playNow.innerHTML = '<svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:#083c3f;"><polygon points="8,5 19,12 8,19"/></svg>';
+    playNow.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      loadTrack(i, true);
+    });
+
+    btns.appendChild(playNow);
+
+    li.appendChild(info);
+    li.appendChild(btns);
+
+    li.addEventListener("click", () => {
+      const track = tracks[i];
+      if (track.page) {
+        // nếu có page thì chuyển trang
+        window.location.href = track.page;
+      } else {
+        loadTrack(i, true);
+        closePlaylist();
+      }
+    });
+
+    trackListEl.appendChild(li);
+  });
+  highlightCurrent();
+}
+
+/* Highlight current */
+function highlightCurrent() {
+  const items = trackListEl.querySelectorAll("li");
+  items.forEach(li => li.classList.remove("active"));
+  const cur = trackListEl.querySelector(`li[data-index="${currentIndex}"]`);
+  if (cur) cur.classList.add("active");
+}
+
+/* Load track */
+function loadTrack(index, playNow = false) {
+  if (index < 0 || index >= tracks.length) return;
+  currentIndex = index;
+  audio.src = tracks[currentIndex].src;
+  highlightCurrent();
+  if (playNow) {
+    audio.play().catch(()=>{});
+    setPlayIcon(true);
+  } else {
+    setPlayIcon(false);
+  }
+}
+
+/* Toggle play */
+function togglePlay() {
+  if (audio.paused) {
+    audio.play().catch(()=>{});
+    setPlayIcon(true);
+  } else {
+    audio.pause();
+    setPlayIcon(false);
+  }
+}
+
+/* Set play icon */
+function setPlayIcon(playing) {
+  if (playing) {
+    playIcon.innerHTML = '<rect x="7" y="6" width="3" height="12"/><rect x="14" y="6" width="3" height="12"/>';
+  } else {
+    playIcon.innerHTML = '<polygon points="8,5 19,12 8,19"/>';
+  }
+}
+
+/* Prev/Next — WRAP-AROUND và chuyển trang nếu target có page */
+function prevTrack(){
+  let newIndex = currentIndex - 1;
+  if (newIndex < 0) newIndex = tracks.length - 1; // wrap to last
+  const target = tracks[newIndex];
+  if (target && target.page) {
+    window.location.href = target.page;
+  } else {
+    loadTrack(newIndex, true);
+  }
+}
+
+function nextTrack(){
+  let newIndex = currentIndex + 1;
+  if (newIndex >= tracks.length) newIndex = 0; // wrap to first
+  const target = tracks[newIndex];
+  if (target && target.page) {
+    window.location.href = target.page;
+  } else {
+    loadTrack(newIndex, true);
+  }
+}
+
+/* Khi audio kết thúc — cũng dùng wrap và chuyển trang nếu cần */
+audio.addEventListener("ended", ()=>{
+  if (isRepeat) {
+    audio.currentTime = 0;
+    audio.play();
+    return;
+  }
+  const nextIndex = (currentIndex + 1) % tracks.length;
+  const target = tracks[nextIndex];
+  if (target && target.page) {
+    window.location.href = target.page;
+  } else {
+    loadTrack(nextIndex, true);
+  }
+});
+
+/* Repeat toggle */
+repeatBtn.onclick = ()=>{
+  isRepeat = !isRepeat;
+  audio.loop = false;
+  repeatBtn.style.background = isRepeat ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.25)";
+};
+
+/* Hook up buttons */
+playBtn.onclick = togglePlay;
+prevBtn.onclick = prevTrack;
+nextBtn.onclick = nextTrack;
+
+volumeBtn.onclick = ()=>{
+  audio.muted = !audio.muted;
+  volumeBtn.style.background = audio.muted ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.25)";
+};
+
+/* Playlist open/close */
+menuBtn.onclick = (e)=>{ e.stopPropagation(); openPlaylist(); };
+closeBtn.onclick = (e)=>{ e.stopPropagation(); closePlaylist(); };
+
+function openPlaylist(){
+  playlistOverlay.classList.add("open");
+  playlistOverlay.setAttribute("aria-hidden", "false");
+  closeBtn.focus();
+}
+
+function closePlaylist(){
+  playlistOverlay.classList.remove("open");
+  playlistOverlay.setAttribute("aria-hidden", "true");
+  menuBtn.focus();
+}
+
+/* Close when clicking outside modal */
+playlistOverlay.addEventListener("click", (e) => {
+  if (!playlistModal.contains(e.target)) closePlaylist();
+});
+playlistModal.addEventListener("click", (e) => e.stopPropagation());
+
+/* Keyboard shortcuts */
+document.addEventListener("keydown", (e)=>{
+  if (e.code === "Space") { e.preventDefault(); togglePlay(); }
+  else if (e.key && e.key.toLowerCase() === "m") { audio.muted = !audio.muted; volumeBtn.style.background = audio.muted ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.25)"; }
+  else if (e.code === "ArrowRight") nextTrack();
+  else if (e.code === "ArrowLeft") prevTrack();
+  else if (e.code === "Escape" && playlistOverlay.classList.contains("open")) closePlaylist();
+});
+
+/* Init */
+renderPlaylist();
+loadTrack(13, false);
+</script>
+
+</body>
+</html>

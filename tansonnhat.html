@@ -10,6 +10,12 @@
     margin:0;
     background:white;
     font-family:Arial, sans-serif;
+    background:
+  radial-gradient(ellipse at 12% 18%, rgba(255,215,235,0.9) 0 12%, transparent 45%),
+  radial-gradient(ellipse at 82% 22%, rgba(255,250,210,0.85) 0 14%, transparent 48%),
+  radial-gradient(ellipse at 35% 85%, rgba(210,255,235,0.85) 0 16%, transparent 55%),
+  radial-gradient(ellipse at 95% 95%, rgba(230,240,255,0.8) 0 14%, transparent 50%),
+  linear-gradient(180deg, #fff6ef 0%, #f3fff8 60%, #effff7 100%);
   }
 
   /* Thanh player */
@@ -191,11 +197,15 @@
     margin:8px 0;
     color:#b30b0b;
   }
-  .hero-img{
-    width:100%;
-    height:250px;
+.hero-img{
+    width:70%;
+    height:auto;
     object-fit:cover;
     margin-bottom:10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px auto;
   }
   .content{
     max-width:1000px;
@@ -214,7 +224,7 @@
     .play-btn{width:64px;height:64px;}
     .playlist-modal{max-width:100%; max-height:100%; border-radius:8px;}
     .playlist-header h4{font-size:16px;}
-    .hero-img{height:160px;}
+    .hero-img{height:auto; width: 100%;}
   }
 </style>
 </head>
@@ -279,7 +289,7 @@
   </div>
 
   <!-- ảnh bìa riêng cho đề mục 1 -->
-  <img class="hero-img" src="./img/Trang bìa.jpg" alt="Đề mục 1 - bìa">
+  <img class="hero-img" src="./img/9.jpg" alt="Đề mục 1 - bìa">
  <h4 style="color:rgb(131, 8, 8); margin:4px 0;text-align: center;text-transform: uppercase;">Sa bàn trận đánh</h4>
   <div class="content">
     <p style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Kính thưa thủ trưởng,</p>
@@ -347,15 +357,19 @@
 const tracks = [
   // ví dụ: track 1 có page -> khi prev/next tới track 1 sẽ điều hướng
   { title: "Giới thiệu tổng quan", src: "./audio/giới thiệu.mp3", content:"Giới thiệu", page: "./gioithieu.html" },
-  { title: "Đề mục 1: giai đoạn 1946-1954",  src: "./audio/đề mục 1.mp3",  content:"Đề mục 1", page: "./demuc1.html" },
-  { title: "Đề mục 2: giai đoạn 1955-1971",  src: "./audio/đề mục 2.mp3", content:"Đề mục 2", page: "./demuc2.html" },
-  { title: "Đề mục 3: giai đoạn 1971-1975",  src: "./audio/đề mục 3.mp3",  content:"Đề mục 3", page: "./demuc3.html" },
-  { title: "Đề mục 4: giai đoạn 1976-1979",  src: "./audio/đề mục 4.mp3", content:"Đề mục 4", page: "./demuc4.html" },
-  { title: "Đề mục 5: giai đoạn 1979-1988",  src: "./audio/đề mục 5.mp3",  content:"Đề mục 5", page: "./demuc5.html" },
-  { title: "Đề mục 6: giai đoạn 1988-2020",  src: "./audio/đề mục 6.mp3", content:"Đề mục 6", page: "./demuc6.html" },
-  { title: "Đề mục 7: giai đoạn 2020 đến nay",  src: "./audio/đề mục 7.mp3",  content:"Đề mục 7", page: "./demuc7.html" },
-  { title: "Trận chiến đấu đánh điểm, diệt viện phương điếm- đường 17 của Trung đoàn 42 Trung Dũng",  src: "./audio/Sa bàn trận đánh.mp3.mp3", content:"sa bàn", page: "./saban.html" },
-  { title: "Trận chiến đấu thọc sâu đánh chiếm sân bay Tân Sơn Nhất của Trung đoàn Bộ binh 24 Trung Dũng",  src: "./audio/trận đánh tân sơn nhất.mp3", content:"tân sơn nhất", page: "./tansonnhat.html" },
+  { title: "Đề mục 1- Không gian khánh tiết", src: "./audio/3. Đề mục 1- Không gian khánh tiết.mp3", content:"Không gian khánh tiết", page: "./khonggiankhanhtiet.html" },
+  { title: "Đề mục 2- Lịch sử hình thành, phát triển Trung đoàn", src: "./audio/4. Đề mục 2- Lịch sử hình thành, phát triển Trung đoàn.mp3", content:"Giới thiệu", page: "lichsuhinhthanh.html" },
+  { title: "Mảng ảnh 1- Đề mục 2 giai đoạn 1946-1954",  src: "./audio/5. Mảng ảnh 1- Đề mục 2.mp3",  content:"Đề mục 1", page: "./demuc1.html" },
+  { title: "Mảng ảnh 2- Đề mục 2 giai đoạn 1955-1971",  src: "./audio/6. Mảng ảnh 2- Đề mục 2.mp3", content:"Đề mục 2", page: "./demuc2.html" },
+  { title: "Mảng ảnh 3- Đề mục 2 giai đoạn 1971-1975",  src: "./audio/7. Mảng ảnh 3- Đề mục 2.mp3",  content:"Đề mục 3", page: "./demuc3.html" },
+  { title: "Mảng ảnh 4- Đề mục  giai đoạn 1976-1979",  src: "./audio/8. Mảng ảnh 4- Đề mục 2.mp3", content:"Đề mục 4", page: "./demuc4.html" },
+  { title: "Mảng ảnh 5- Đề mục 2 giai đoạn 1979-1988",  src: "./audio/9. Mảng ảnh 5- Đề mục 2.mp3",  content:"Đề mục 5", page: "./demuc5.html" },
+  { title: "Mảng ảnh 6- Đề mục 2 giai đoạn 1988-2020",  src: "./audio/10. Mảng ảnh 6- Đề mục 2.mp3", content:"Đề mục 6", page: "./demuc6.html" },
+  { title: "Mảng ảnh 7- Đề mục 2 giai đoạn 2020 đến nay",  src: "./audio/11. Mảng ảnh 7- Đề mục 2.mp3",  content:"Đề mục 7", page: "./demuc7.html" },
+  { title: "Đề mục 3- Trận đánh điểm diệt viện",  src: "./audio/12. Đề mục 3- Trận đánh điểm diệt viện.mp3", content:"sa bàn", page: "./saban.html" },
+  { title: "Đề mục 3- Trận đánh Sân bay Tân Sơn Nhất",  src: "./audio/13. Đề mục 3- Trận đánh Sân bay Tân Sơn Nhất.mp3", content:"tân sơn nhất", page: "./tansonnhat.html" },
+  { title: "Đề mục 4- Hiện vật lịch sử",  src: "./audio/14. Đề mục 4- Hiện vật lịch sử .mp3", content:"tân sơn nhất", page: "./hienvatlichsu.html" },
+  { title: "Đề mục 5- Phần thưởng cao quý",  src: "./audio/15. Đề mục 5- Phần thưởng cao quý.mp3", content:"tân sơn nhất", page: "./phanthuongcaoquy.html" },
 ];
 
 /* DOM elements (không đổi) */
